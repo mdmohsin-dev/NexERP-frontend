@@ -98,18 +98,32 @@ export function AppLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Mobile top bar with hamburger toggle */}
-        <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-3 md:hidden">
-          <button
-            onClick={() => setMobileNavOpen(true)}
-            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="flex items-center gap-2">
-            <Boxes className="h-5 w-5 text-primary" />
-            <span className="font-bold">Mini ERP</span>
+        {/* Top navbar - visible on all screen sizes */}
+        <header className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3 md:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileNavOpen(true)}
+              className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground md:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2 md:hidden">
+              <Boxes className="h-5 w-5 text-primary" />
+              <span className="font-bold">Mini ERP</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="truncate text-sm font-medium leading-tight">{user?.name}</p>
+              <p className="truncate text-xs capitalize leading-tight text-muted-foreground">
+                {user?.role}
+              </p>
+            </div>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+              {user?.name?.charAt(0).toUpperCase()}
+            </div>
           </div>
         </header>
 

@@ -66,6 +66,11 @@ export interface ApiSingleResponse<T> {
   data: T;
 }
 
+export interface DailySalesPoint {
+  date: string;
+  quantitySold: number;
+}
+
 export interface DashboardStats {
   totalProducts: number;
   totalCustomers: number;

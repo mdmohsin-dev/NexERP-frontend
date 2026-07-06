@@ -1,6 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { Package, Users, ShoppingCart, DollarSign, AlertTriangle } from 'lucide-react';
-import { getDashboardStats } from '@/api/dashboard.api';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import { Package, Users, ShoppingCart, DollarSign, AlertTriangle, TrendingUp } from 'lucide-react';
+import { getDashboardStats, getDailySalesChart } from '@/api/dashboard.api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
@@ -13,11 +22,73 @@ const statCards: {
   icon: typeof Package;
   isCurrency?: boolean;
 }[] = [
-  { key: 'totalProducts', label: 'Total Products', icon: Package },
-  { key: 'totalCustomers', label: 'Total Customers', icon: Users },
-  { key: 'totalSales', label: 'Total Sales', icon: ShoppingCart },
-  { key: 'totalRevenue', label: 'Total Revenue', icon: DollarSign, isCurrency: true },
-];
+    { key: 'totalProducts', label: 'Total Products', icon: Package },
+    { key: 'totalCustomers', label: 'Total Customers', icon: Users },
+    { key: 'totalSales', label: 'Total Sales', icon: ShoppingCart },
+    { key: 'totalRevenue', label: 'Total Revenue', icon: DollarSign, isCurrency: true },
+  ];
+
+// Formats "2026-07-07" -> "Jul 7" for compact X-axis labels
+const formatDateLabel = (isoDate: string) => {
+  const date = new Date(`${isoDate}T00:00:00`);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+function DailySalesChart() {
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['dashboard-sales-chart', 30],
+    queryFn: () => getDailySalesChart(30),
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          Products Sold — Last 30 Days
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading && <Spinner />}
+        {isError && <Alert variant="destructive">{getErrorMessage(error)}</Alert>}
+        {data && (
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={formatDateLabel}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  interval={window.innerWidth < 640 ? 6 : 2}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  labelFormatter={(label) => formatDateLabel(String(label))}
+                  formatter={(value) => [`${value} units`, 'Sold']}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    borderColor: 'hsl(var(--border))',
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                />
+                <Bar dataKey="quantitySold" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export function DashboardPage() {
   const { data, isLoading, isError, error } = useQuery({
@@ -53,6 +124,8 @@ export function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      <DailySalesChart />
 
       <Card>
         <CardHeader>
