@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { Alert } from '@/components/ui/alert';
+import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProductForm } from '@/components/ProductForm';
 
@@ -54,6 +55,13 @@ export function ProductsPage() {
     setDialogOpen(true);
   };
 
+  const handleDelete = (product: Product) => {
+    setDeleteError(null);
+    if (confirm(`Delete "${product.name}"?`)) {
+      deleteMutation.mutate(product._id);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -83,7 +91,7 @@ export function ProductsPage() {
         )}
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative w-full sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search by name, SKU or category..."
@@ -110,69 +118,110 @@ export function ProductsPage() {
       )}
 
       {data && data.data.length > 0 && (
-        <div className="overflow-hidden rounded-lg border border-border bg-card">
-          <table className="w-full text-sm">
-            <thead className="border-b border-border bg-secondary/50 text-left text-xs uppercase text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">SKU</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Purchase</th>
-                <th className="px-4 py-3">Selling</th>
-                <th className="px-4 py-3">Stock</th>
-                {canManage && <th className="px-4 py-3 text-right">Actions</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {data.data.map((product) => (
-                <tr key={product._id}>
-                  <td className="flex items-center gap-3 px-4 py-3">
-                    <img
-                      src={`${API_ORIGIN}${product.image}`}
-                      alt={product.name}
-                      className="h-10 w-10 rounded-md object-cover"
-                    />
-                    <span className="font-medium">{product.name}</span>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{product.sku}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{product.category}</td>
-                  <td className="px-4 py-3">${product.purchasePrice.toFixed(2)}</td>
-                  <td className="px-4 py-3">${product.sellingPrice.toFixed(2)}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={product.stockQuantity < 5 ? 'warning' : 'secondary'}>
-                      {product.stockQuantity}
-                    </Badge>
-                  </td>
-                  {canManage && (
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setDeleteError(null);
-                            if (confirm(`Delete "${product.name}"?`)) {
-                              deleteMutation.mutate(product._id);
-                            }
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+        <>
+          {/* Mobile: card list (below sm breakpoint) */}
+          <div className="space-y-3 sm:hidden">
+            {data.data.map((product) => (
+              <Card key={product._id} className="p-3">
+                <div className="flex items-start gap-3">
+                  <img
+                    src={`${API_ORIGIN}${product.image}`}
+                    alt={product.name}
+                    className="h-14 w-14 shrink-0 rounded-md object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="truncate font-medium">{product.name}</p>
+                      <Badge variant={product.stockQuantity < 5 ? 'warning' : 'secondary'}>
+                        {product.stockQuantity} in stock
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      SKU: {product.sku} · {product.category}
+                    </p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-sm">
+                        <span className="text-muted-foreground">Buy </span>${product.purchasePrice.toFixed(2)}
+                        <span className="mx-1.5 text-muted-foreground">·</span>
+                        <span className="text-muted-foreground">Sell </span>${product.sellingPrice.toFixed(2)}
+                      </p>
+                      {canManage && (
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(product)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Tablet & up: table with horizontal scroll safety net */}
+          <div className="hidden overflow-x-auto rounded-lg border border-border bg-card sm:block">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead className="border-b border-border bg-secondary/50 text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Product</th>
+                  <th className="px-4 py-3">SKU</th>
+                  <th className="hidden px-4 py-3 lg:table-cell">Category</th>
+                  <th className="hidden px-4 py-3 md:table-cell">Purchase</th>
+                  <th className="px-4 py-3">Selling</th>
+                  <th className="px-4 py-3">Stock</th>
+                  {canManage && <th className="px-4 py-3 text-right">Actions</th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.data.map((product) => (
+                  <tr key={product._id}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={`${API_ORIGIN}${product.image}`}
+                          alt={product.name}
+                          className="h-10 w-10 shrink-0 rounded-md object-cover"
+                        />
+                        <span className="font-medium">{product.name}</span>
                       </div>
                     </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <td className="px-4 py-3 text-muted-foreground">{product.sku}</td>
+                    <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">
+                      {product.category}
+                    </td>
+                    <td className="hidden px-4 py-3 md:table-cell">${product.purchasePrice.toFixed(2)}</td>
+                    <td className="px-4 py-3">${product.sellingPrice.toFixed(2)}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant={product.stockQuantity < 5 ? 'warning' : 'secondary'}>
+                        {product.stockQuantity}
+                      </Badge>
+                    </td>
+                    {canManage && (
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(product)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(product)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {data && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
             Page {data.meta.page} of {data.meta.totalPages} ({data.meta.total} products)
           </p>

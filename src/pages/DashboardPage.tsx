@@ -67,10 +67,13 @@ export function DashboardPage() {
           ) : (
             <div className="divide-y divide-border">
               {data.lowStockProducts.map((product) => (
-                <div key={product._id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="text-sm font-medium">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">
+                <div
+                  key={product._id}
+                  className="flex flex-wrap items-center justify-between gap-2 py-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{product.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
                       SKU: {product.sku} · {product.category}
                     </p>
                   </div>
