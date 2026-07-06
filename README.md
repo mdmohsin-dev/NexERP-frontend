@@ -1,32 +1,110 @@
-# React + TypeScript + Vite
+# Mini ERP Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend for the Mini ERP – Inventory & Sales Management System.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Shadcn UI
+- React Router
+- TanStack Query
+- React Hook Form
+- Axios
+- Zod
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- JWT Authentication
+- Protected Routes
+- Dashboard
+- Product Management
+- Customer Management
+- Sales Management
+- Responsive Design
+- Form Validation
+- API Integration
 
-## Expanding the Oxlint configuration
+## Live Website
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+https://nex-erp-frontend.vercel.app/login
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Backend API
+
+```
+https://nexerp-backend-production.up.railway.app/api/v1
+```
+
+## Installation
+
+```bash
+git clone <frontend-repository-url>
+
+cd frontend
+
+npm install
+```
+
+## Environment Variables
+
+Create a `.env` file.
+
+```env
+VITE_API_URL=https://nexerp-backend-production.up.railway.app/api/v1
+```
+
+## Run Locally
+
+```bash
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Preview
+
+```bash
+npm run preview
+```
+
+## Login Credentials
+
+```
+Email:
+admin@example.com
+
+Password:
+Admin@123
+```
+
+> Replace with your actual seeded admin credentials.
+
+## Folder Structure
+
+```
+src
+ ├── components
+ ├── pages
+ ├── layouts
+ ├── routes
+ ├── context
+ ├── services
+ ├── utils
+ └── main.tsx
+```
+
+## Pages
+
+- Login
+- Dashboard
+- Products
+- Customers
+- Sales

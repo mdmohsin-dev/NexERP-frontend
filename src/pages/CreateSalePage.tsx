@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, CheckCircle2, UserPlus } from 'lucide-react';
+import type { Customer } from '@/types';
 import { getProducts } from '@/api/product.api';
 import { getCustomers } from '@/api/customer.api';
 import { createSale } from '@/api/sale.api';
@@ -16,6 +17,8 @@ import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { CustomerForm } from '@/components/CustomerForm';
 
 const saleSchema = z.object({
   customer: z.string().min(1, 'Please select a customer'),
@@ -36,6 +39,7 @@ export function CreateSalePage() {
   const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
 
   const { data: productsData, isLoading: loadingProducts } = useQuery({
     queryKey: ['products', { forSale: true }],
@@ -53,6 +57,7 @@ export function CreateSalePage() {
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SaleFormValues>({
     resolver: zodResolver(saleSchema),
@@ -77,6 +82,13 @@ export function CreateSalePage() {
     setServerError(null);
     setSuccessMessage(null);
     mutation.mutate(values);
+  };
+
+  // Called when a new customer is created from the inline dialog.
+  // Selects the newly created customer in the form and closes the dialog.
+  const handleCustomerCreated = (customer: Customer) => {
+    setValue('customer', customer._id, { shouldValidate: true });
+    setCustomerDialogOpen(false);
   };
 
   const watchedItems = watch('items');
@@ -109,10 +121,28 @@ export function CreateSalePage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Customer</CardTitle>
+
+            <Dialog open={customerDialogOpen} onOpenChange={setCustomerDialogOpen}>
+              <DialogTrigger asChild>
+                <Button type="button" variant="outline" size="sm">
+                  <UserPlus className="h-4 w-4" />
+                  Add New Customer
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <CustomerForm onSuccess={handleCustomerCreated} />
+              </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent>
+            {customersData && customersData.data.length === 0 ? (
+              <p className="mb-2 text-sm text-muted-foreground">
+                No customers yet. Click "Add New Customer" above to create one.
+              </p>
+            ) : null}
+
             <Controller
               control={control}
               name="customer"
