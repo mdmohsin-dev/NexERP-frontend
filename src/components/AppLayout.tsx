@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, LogOut, Boxes, Menu, X } from 'lucide-react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Package, ShoppingCart, LogOut, Boxes, Menu, X, Link } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ export function AppLayout() {
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  // Close the mobile drawer automatically whenever the route changes
+
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
@@ -28,10 +28,12 @@ export function AppLayout() {
 
   const sidebarContent = (
     <>
-      <div className="flex items-center justify-between gap-2 border-b border-border px-6 py-5">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-6 py-3">
         <div className="flex items-center gap-2">
           <Boxes className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">Mini ERP</span>
+          <Link to="/dashboard" className="text-lg font-bold">
+            NexERP
+          </Link>
         </div>
         <button
           onClick={() => setMobileNavOpen(false)}
@@ -63,10 +65,6 @@ export function AppLayout() {
       </nav>
 
       <div className="border-t border-border p-4">
-        <div className="mb-3 px-1">
-          <p className="truncate text-sm font-medium">{user?.name}</p>
-          <p className="truncate text-xs capitalize text-muted-foreground">{user?.role}</p>
-        </div>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
@@ -116,7 +114,9 @@ export function AppLayout() {
             </button>
             <div className="flex items-center gap-2 md:hidden">
               <Boxes className="h-5 w-5 text-primary" />
-              <span className="font-bold">Mini ERP</span>
+              <Link to="/dashboard" className="font-bold">
+                NexERP
+              </Link>
             </div>
           </div>
 
