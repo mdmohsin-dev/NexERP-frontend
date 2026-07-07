@@ -14,6 +14,7 @@ import { Alert } from '@/components/ui/alert';
 import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ProductForm } from '@/components/ProductForm';
+import { confirmAction } from '@/lib/confirm';
 
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1').replace(
   '/api/v1',
@@ -61,11 +62,18 @@ export function ProductsPage() {
     setDialogOpen(true);
   };
 
-  const handleDelete = (product: Product) => {
+  const handleDelete = async (product: Product) => {
     setDeleteError(null);
-    if (confirm(`Delete "${product.name}"?`)) {
-      deleteMutation.mutate(product._id);
-    }
+    const confirmed = await confirmAction({
+      title: `Delete "${product.name}"?`,
+      text: 'This action cannot be undone.',
+      confirmText: 'Yes, delete',
+      cancelText: 'Cancel',
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    deleteMutation.mutate(product._id);
   };
 
   return (
