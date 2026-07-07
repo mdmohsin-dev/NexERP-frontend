@@ -7,6 +7,7 @@ import { ImagePlus } from 'lucide-react';
 import type { Product } from '@/types';
 import { createProduct, updateProduct } from '@/api/product.api';
 import { getErrorMessage } from '@/lib/axios';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -76,9 +77,14 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      toast.success(isEdit ? 'Product updated successfully' : 'Product added successfully');
       onSuccess();
     },
-    onError: (error) => setServerError(getErrorMessage(error)),
+    onError: (error) => {
+      const message = getErrorMessage(error);
+      setServerError(message);
+      toast.error(message);
+    },
   });
 
   const onSubmit = (values: ProductFormValues) => {

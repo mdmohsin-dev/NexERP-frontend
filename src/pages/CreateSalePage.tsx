@@ -10,6 +10,7 @@ import { getProducts } from '@/api/product.api';
 import { getCustomers } from '@/api/customer.api';
 import { createSale } from '@/api/sale.api';
 import { getErrorMessage } from '@/lib/axios';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -72,10 +73,15 @@ export function CreateSalePage() {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
       setSuccessMessage(`Sale created successfully. Grand total: $${sale.grandTotal.toFixed(2)}`);
+      toast.success(`Sale created successfully — $${sale.grandTotal.toFixed(2)}`);
       reset({ customer: '', items: [{ product: '', quantity: 1 }] });
       setTimeout(() => navigate('/dashboard'), 1800);
     },
-    onError: (error) => setServerError(getErrorMessage(error)),
+    onError: (error) => {
+      const message = getErrorMessage(error);
+      setServerError(message);
+      toast.error(message);
+    },
   });
 
   const onSubmit = (values: SaleFormValues) => {

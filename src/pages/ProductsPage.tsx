@@ -5,6 +5,7 @@ import type { Product } from '@/types';
 import { getProducts, deleteProduct } from '@/api/product.api';
 import { useAuth } from '@/context/AuthContext';
 import { getErrorMessage } from '@/lib/axios';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -41,8 +42,13 @@ export function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      toast.success('Product deleted successfully');
     },
-    onError: (err) => setDeleteError(getErrorMessage(err)),
+    onError: (err) => {
+      const message = getErrorMessage(err);
+      setDeleteError(message);
+      toast.error(message);
+    },
   });
 
   const openAddDialog = () => {

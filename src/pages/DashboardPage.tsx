@@ -22,16 +22,22 @@ const statCards: {
   icon: typeof Package;
   isCurrency?: boolean;
 }[] = [
-    { key: 'totalProducts', label: 'Total Products', icon: Package },
-    { key: 'totalCustomers', label: 'Total Customers', icon: Users },
-    { key: 'totalSales', label: 'Total Sales', icon: ShoppingCart },
-    { key: 'totalRevenue', label: 'Total Revenue', icon: DollarSign, isCurrency: true },
-  ];
+  { key: 'totalProducts', label: 'Total Products', icon: Package },
+  { key: 'totalCustomers', label: 'Total Customers', icon: Users },
+  { key: 'totalSales', label: 'Total Sales', icon: ShoppingCart },
+  { key: 'totalRevenue', label: 'Total Revenue', icon: DollarSign, isCurrency: true },
+];
 
-// Formats "2026-07-07" -> "Jul 7" for compact X-axis labels
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+// Formats "2026-07-07" -> "Jul 7" by parsing the string directly (no Date
+// object / timezone conversion involved, so the label always matches exactly
+// what the backend sent — no off-by-one-day risk from browser timezone).
 const formatDateLabel = (isoDate: string) => {
-  const date = new Date(`${isoDate}T00:00:00`);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const [, month, day] = isoDate.split('-').map(Number);
+  return `${MONTH_NAMES[month - 1]} ${day}`;
 };
 
 function DailySalesChart() {
@@ -60,7 +66,7 @@ function DailySalesChart() {
                   dataKey="date"
                   tickFormatter={formatDateLabel}
                   tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
-                  interval={window.innerWidth < 640 ? 6 : 2}
+                  interval={typeof window !== 'undefined' && window.innerWidth < 640 ? 6 : 2}
                   axisLine={{ stroke: 'hsl(var(--border))' }}
                   tickLine={false}
                 />

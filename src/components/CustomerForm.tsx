@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Customer } from '@/types';
 import { createCustomer } from '@/api/customer.api';
 import { getErrorMessage } from '@/lib/axios';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,9 +42,14 @@ export function CustomerForm({ onSuccess }: CustomerFormProps) {
     mutationFn: createCustomer,
     onSuccess: (customer) => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      toast.success('Customer added successfully');
       onSuccess(customer);
     },
-    onError: (error) => setServerError(getErrorMessage(error)),
+    onError: (error) => {
+      const message = getErrorMessage(error);
+      setServerError(message);
+      toast.error(message);
+    },
   });
 
   const onSubmit = (values: CustomerFormValues) => {

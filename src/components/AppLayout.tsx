@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, ShoppingCart, LogOut, Boxes, Menu, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +20,11 @@ export function AppLayout() {
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+  };
 
   const sidebarContent = (
     <>
@@ -62,7 +68,7 @@ export function AppLayout() {
           <p className="truncate text-xs capitalize text-muted-foreground">{user?.role}</p>
         </div>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         >
           <LogOut className="h-4 w-4" />
