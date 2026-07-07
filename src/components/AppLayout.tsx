@@ -28,7 +28,7 @@ export function AppLayout() {
 
   const sidebarContent = (
     <>
-      <div className="flex items-center justify-between gap-2 border-b border-border px-6 py-3">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-6 py-4">
         <div className="flex items-center gap-2">
           <Boxes className="h-6 w-6 text-primary" />
           <Link to="/dashboard" className="text-lg font-bold">
